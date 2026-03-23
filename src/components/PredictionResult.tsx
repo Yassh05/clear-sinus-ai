@@ -313,8 +313,15 @@ export function PredictionResult({ result, onReset }: PredictionResultProps) {
         </p>
       </div>
 
-      <div className="opacity-0 animate-fade-up" style={{ animationDelay: "700ms" }}>
-        <Button variant="outline" onClick={onReset} className="w-full h-12 rounded-xl active:scale-[0.98] transition-all">
+      <div className="opacity-0 animate-fade-up flex gap-3" style={{ animationDelay: "700ms" }}>
+        <Button
+          onClick={() => generateMedicalReport(result)}
+          className="flex-1 h-12 rounded-xl active:scale-[0.98] transition-all"
+        >
+          <Download className="w-4 h-4" />
+          Download PDF Report
+        </Button>
+        <Button variant="outline" onClick={onReset} className="flex-1 h-12 rounded-xl active:scale-[0.98] transition-all">
           <ArrowLeft className="w-4 h-4" />
           New Assessment
         </Button>
