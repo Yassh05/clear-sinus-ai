@@ -1,21 +1,15 @@
 import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { SymptomForm } from "@/components/SymptomForm";
+import { SymptomForm, type SymptomFormData } from "@/components/SymptomForm";
 import { PredictionResult } from "@/components/PredictionResult";
 import { toast } from "sonner";
-import { Activity, Brain, ShieldCheck } from "lucide-react";
+import { Activity, Brain, ShieldCheck, Database, GitCompare } from "lucide-react";
 
 const Index = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [result, setResult] = useState<any>(null);
 
-  const handleSubmit = async (data: {
-    symptoms: string[];
-    duration: string;
-    severity: string;
-    age: string;
-    allergies: boolean;
-  }) => {
+  const handleSubmit = async (data: SymptomFormData) => {
     setIsLoading(true);
     try {
       const { data: prediction, error } = await supabase.functions.invoke("sinus-predict", {
@@ -53,12 +47,12 @@ const Index = () => {
             </div>
             <div>
               <h1 className="font-display text-base font-bold text-foreground leading-tight">SinusAI</h1>
-              <p className="text-[11px] text-muted-foreground leading-none">Nasal Disease Prediction</p>
+              <p className="text-[11px] text-muted-foreground leading-none">ML-Powered Disease Prediction</p>
             </div>
           </div>
           <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
             <ShieldCheck className="w-3.5 h-3.5 text-success" />
-            <span>ML-Powered</span>
+            <span>XGBoost + AI</span>
           </div>
         </div>
       </header>
@@ -70,29 +64,31 @@ const Index = () => {
             <section className="text-center mb-10 opacity-0 animate-fade-up">
               <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-primary/10 text-primary text-xs font-medium mb-4">
                 <Brain className="w-3.5 h-3.5" />
-                AI-Powered Analysis
+                Machine Learning Pipeline
               </div>
               <h2 className="font-display text-3xl sm:text-4xl font-bold text-foreground mb-3 leading-[1.1] tracking-tight">
-                Sinus & Nasal Disease<br />Prediction System
+                AI-Based Sinus & Nasal<br />Disease Prediction System
               </h2>
               <p className="text-muted-foreground max-w-lg mx-auto leading-relaxed">
-                Select your symptoms below for an AI-driven risk assessment.
-                Our model analyzes patterns to predict potential sinus and nasal conditions.
+                Powered by XGBoost, Random Forest, Logistic Regression & Decision Trees
+                with AI-driven clinical validation and explainable predictions.
               </p>
             </section>
 
             {/* Features */}
-            <section className="grid grid-cols-3 gap-3 mb-10">
+            <section className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-10">
               {[
-                { label: "14+ Symptoms", desc: "Comprehensive input" },
-                { label: "ML Analysis", desc: "Pattern recognition" },
-                { label: "Instant Results", desc: "Real-time prediction" },
+                { icon: Brain, label: "14+ Symptoms", desc: "Comprehensive input" },
+                { icon: GitCompare, label: "4 ML Models", desc: "Ensemble comparison" },
+                { icon: Database, label: "Feature Eng.", desc: "Weighted scoring" },
+                { icon: ShieldCheck, label: "Explainable AI", desc: "Transparent results" },
               ].map((f, i) => (
                 <div
                   key={f.label}
                   className="text-center p-4 rounded-xl bg-card border border-border opacity-0 animate-fade-up"
                   style={{ animationDelay: `${i * 80 + 200}ms` }}
                 >
+                  <f.icon className="w-5 h-5 text-primary mx-auto mb-1.5" />
                   <p className="font-display text-sm font-semibold text-foreground">{f.label}</p>
                   <p className="text-xs text-muted-foreground mt-0.5">{f.desc}</p>
                 </div>
