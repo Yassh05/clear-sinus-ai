@@ -161,6 +161,7 @@ export function SymptomForm({ onSubmit, isLoading }: SymptomFormProps) {
       previous_sinus_history: previousHistory,
       environment,
       medications,
+      report_urls: uploadedFiles.map((f) => f.url),
     });
   };
 
