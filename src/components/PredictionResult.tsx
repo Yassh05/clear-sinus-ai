@@ -38,6 +38,8 @@ interface PredictionData {
   probability_distribution: ProbabilityDist[];
   primary_model: string;
   pipeline_steps: string[];
+  report_findings?: string;
+  reports_analyzed?: number;
 }
 
 interface PredictionResultProps {
