@@ -60,6 +60,57 @@
 
     font-family: 'DM Sans', system-ui, sans-serif;
   }
+
+  .dark {
+    --background: 220 20% 8%;
+    --foreground: 200 15% 90%;
+
+    --card: 220 18% 11%;
+    --card-foreground: 200 15% 90%;
+
+    --popover: 220 18% 11%;
+    --popover-foreground: 200 15% 90%;
+
+    --primary: 187 55% 45%;
+    --primary-foreground: 220 20% 8%;
+
+    --secondary: 220 15% 16%;
+    --secondary-foreground: 200 15% 85%;
+
+    --muted: 220 12% 18%;
+    --muted-foreground: 200 10% 55%;
+
+    --accent: 160 40% 40%;
+    --accent-foreground: 0 0% 100%;
+
+    --destructive: 0 62% 50%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 220 12% 18%;
+    --input: 220 12% 20%;
+    --ring: 187 55% 45%;
+
+    --sidebar-background: 220 18% 10%;
+    --sidebar-foreground: 200 10% 80%;
+    --sidebar-primary: 200 15% 90%;
+    --sidebar-primary-foreground: 220 20% 8%;
+    --sidebar-accent: 220 12% 16%;
+    --sidebar-accent-foreground: 200 15% 85%;
+    --sidebar-border: 220 12% 16%;
+    --sidebar-ring: 187 55% 45%;
+
+    --surface-elevated: 220 16% 13%;
+    --surface-sunken: 220 20% 6%;
+    --success: 152 50% 38%;
+    --success-foreground: 0 0% 100%;
+    --warning: 38 85% 50%;
+    --warning-foreground: 0 0% 100%;
+    --info: 205 70% 50%;
+    --info-foreground: 0 0% 100%;
+    --risk-low: 152 50% 38%;
+    --risk-moderate: 38 85% 50%;
+    --risk-high: 0 62% 50%;
+  }
 }
 
 @layer base {
