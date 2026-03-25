@@ -2,6 +2,7 @@ import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { SymptomForm, type SymptomFormData } from "@/components/SymptomForm";
 import { PredictionResult } from "@/components/PredictionResult";
+import { FollowUpChat } from "@/components/FollowUpChat";
 import { toast } from "sonner";
 import { Activity, Brain, ShieldCheck, Database, GitCompare } from "lucide-react";
 
@@ -100,9 +101,12 @@ const Index = () => {
             </div>
           </>
         ) : (
-          <div className="max-w-2xl mx-auto">
-            <PredictionResult result={result} onReset={() => setResult(null)} />
-          </div>
+          <>
+            <div className="max-w-2xl mx-auto">
+              <PredictionResult result={result} onReset={() => setResult(null)} />
+            </div>
+            <FollowUpChat predictionContext={result} />
+          </>
         )}
       </main>
     </div>
