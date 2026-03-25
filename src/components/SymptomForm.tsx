@@ -1,6 +1,8 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { Button } from "@/components/ui/button";
-import { Loader2, Stethoscope, ChevronDown, ChevronUp } from "lucide-react";
+import { Loader2, Stethoscope, ChevronDown, ChevronUp, Upload, X, FileText, Image as ImageIcon } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 
 const SYMPTOM_CATEGORIES = [
   {
