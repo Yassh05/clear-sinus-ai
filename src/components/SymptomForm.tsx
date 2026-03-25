@@ -393,6 +393,55 @@ export function SymptomForm({ onSubmit, isLoading }: SymptomFormProps) {
         )}
       </div>
 
+      {/* Medical Reports Upload */}
+      <div className="opacity-0 animate-fade-up" style={{ animationDelay: "750ms" }}>
+        <h3 className="font-display text-lg font-semibold text-foreground mb-2">Upload Medical Reports (Optional)</h3>
+        <p className="text-xs text-muted-foreground mb-3">Upload lab results, CT/X-ray scans, or doctor notes (PDF, JPG, PNG — max 10MB each)</p>
+        
+        <input
+          ref={fileInputRef}
+          type="file"
+          multiple
+          accept=".pdf,.jpg,.jpeg,.png,.webp"
+          onChange={handleFileUpload}
+          className="hidden"
+        />
+        
+        <button
+          type="button"
+          onClick={() => fileInputRef.current?.click()}
+          disabled={isUploading}
+          className="w-full p-6 rounded-xl border-2 border-dashed border-border bg-card hover:border-primary/40 hover:bg-primary/5 transition-all duration-200 flex flex-col items-center gap-2"
+        >
+          {isUploading ? (
+            <Loader2 className="w-6 h-6 text-primary animate-spin" />
+          ) : (
+            <Upload className="w-6 h-6 text-muted-foreground" />
+          )}
+          <span className="text-sm font-medium text-muted-foreground">
+            {isUploading ? "Uploading..." : "Click to upload or drag files here"}
+          </span>
+        </button>
+
+        {uploadedFiles.length > 0 && (
+          <div className="mt-3 space-y-2">
+            {uploadedFiles.map((file) => (
+              <div key={file.url} className="flex items-center gap-3 p-3 rounded-lg bg-surface-sunken border border-border">
+                {file.type.startsWith("image/") ? (
+                  <ImageIcon className="w-4 h-4 text-primary shrink-0" />
+                ) : (
+                  <FileText className="w-4 h-4 text-primary shrink-0" />
+                )}
+                <span className="text-sm text-foreground truncate flex-1">{file.name}</span>
+                <button type="button" onClick={() => removeFile(file.url)} className="text-muted-foreground hover:text-destructive transition-colors">
+                  <X className="w-4 h-4" />
+                </button>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+
       {/* Submit */}
       <div className="opacity-0 animate-fade-up pt-4" style={{ animationDelay: "800ms" }}>
         <Button
