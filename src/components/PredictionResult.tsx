@@ -1,4 +1,4 @@
-import { AlertTriangle, CheckCircle2, Info, Shield, ArrowLeft, Brain, BarChart3, GitCompare, Layers, Lightbulb, Download } from "lucide-react";
+import { AlertTriangle, CheckCircle2, Info, Shield, ArrowLeft, Brain, BarChart3, GitCompare, Layers, Lightbulb, Download, FileText } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell } from "recharts";
 import { generateMedicalReport } from "@/utils/generateReport";
