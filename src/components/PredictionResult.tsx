@@ -252,7 +252,22 @@ export function PredictionResult({ result, onReset }: PredictionResultProps) {
         </div>
       )}
 
-      {/* Differential diagnoses */}
+      {/* Report Findings */}
+      {result.report_findings && result.report_findings.trim() !== "" && (
+        <div className="opacity-0 animate-fade-up rounded-xl border border-info/30 bg-info/5 p-5" style={{ animationDelay: "420ms" }}>
+          <div className="flex items-start gap-3">
+            <FileText className="w-5 h-5 text-info mt-0.5 shrink-0" />
+            <div>
+              <h3 className="font-display font-semibold text-foreground mb-1">
+                Medical Report Findings ({result.reports_analyzed} report{result.reports_analyzed !== 1 ? "s" : ""} analyzed)
+              </h3>
+              <p className="text-sm text-muted-foreground leading-relaxed whitespace-pre-line">{result.report_findings}</p>
+            </div>
+          </div>
+        </div>
+      )}
+
+
       {result.differential_diagnoses?.length > 0 && (
         <div className="opacity-0 animate-fade-up rounded-xl border border-border bg-card p-5" style={{ animationDelay: "450ms" }}>
           <h3 className="font-display text-lg font-semibold text-foreground mb-3">Differential Diagnoses</h3>
