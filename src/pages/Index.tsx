@@ -5,6 +5,7 @@ import { PredictionResult } from "@/components/PredictionResult";
 import { FollowUpChat } from "@/components/FollowUpChat";
 import { toast } from "sonner";
 import { Activity, Brain, ShieldCheck, Database, GitCompare } from "lucide-react";
+import { ThemeToggle } from "@/components/ThemeToggle";
 
 const Index = () => {
   const [isLoading, setIsLoading] = useState(false);
