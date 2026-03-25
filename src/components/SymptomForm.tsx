@@ -74,6 +74,7 @@ export interface SymptomFormData {
   previous_sinus_history: boolean;
   environment: string;
   medications: string;
+  report_urls: string[];
 }
 
 interface SymptomFormProps {
