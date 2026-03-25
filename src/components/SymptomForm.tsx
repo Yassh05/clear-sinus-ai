@@ -94,6 +94,52 @@ export function SymptomForm({ onSubmit, isLoading }: SymptomFormProps) {
   const [environment, setEnvironment] = useState("");
   const [medications, setMedications] = useState("");
   const [showAdvanced, setShowAdvanced] = useState(false);
+  const [uploadedFiles, setUploadedFiles] = useState<{ name: string; url: string; type: string }[]>([]);
+  const [isUploading, setIsUploading] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (!files || files.length === 0) return;
+
+    const allowed = ["application/pdf", "image/jpeg", "image/png", "image/webp"];
+    const maxSize = 10 * 1024 * 1024; // 10MB
+
+    setIsUploading(true);
+    try {
+      for (const file of Array.from(files)) {
+        if (!allowed.includes(file.type)) {
+          toast.error(`${file.name}: Only PDF, JPG, PNG, WEBP files are supported.`);
+          continue;
+        }
+        if (file.size > maxSize) {
+          toast.error(`${file.name}: File too large (max 10MB).`);
+          continue;
+        }
+
+        const ext = file.name.split(".").pop();
+        const path = `${crypto.randomUUID()}.${ext}`;
+        const { error } = await supabase.storage.from("medical-reports").upload(path, file);
+        if (error) {
+          toast.error(`Failed to upload ${file.name}`);
+          continue;
+        }
+
+        const { data: urlData } = supabase.storage.from("medical-reports").getPublicUrl(path);
+        setUploadedFiles((prev) => [...prev, { name: file.name, url: urlData.publicUrl, type: file.type }]);
+      }
+      toast.success("Reports uploaded successfully!");
+    } catch {
+      toast.error("Upload failed. Please try again.");
+    } finally {
+      setIsUploading(false);
+      if (fileInputRef.current) fileInputRef.current.value = "";
+    }
+  };
+
+  const removeFile = (url: string) => {
+    setUploadedFiles((prev) => prev.filter((f) => f.url !== url));
+  };
 
   const toggleSymptom = (id: string) => {
     setSelectedSymptoms((prev) => (prev.includes(id) ? prev.filter((s) => s !== id) : [...prev, id]));
