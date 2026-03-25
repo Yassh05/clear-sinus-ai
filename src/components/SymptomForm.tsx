@@ -424,18 +424,30 @@ export function SymptomForm({ onSubmit, isLoading }: SymptomFormProps) {
         </button>
 
         {uploadedFiles.length > 0 && (
-          <div className="mt-3 space-y-2">
+          <div className="mt-3 grid grid-cols-1 sm:grid-cols-2 gap-3">
             {uploadedFiles.map((file) => (
-              <div key={file.url} className="flex items-center gap-3 p-3 rounded-lg bg-surface-sunken border border-border">
+              <div key={file.url} className="relative group rounded-xl border border-border bg-surface-sunken overflow-hidden">
                 {file.type.startsWith("image/") ? (
-                  <ImageIcon className="w-4 h-4 text-primary shrink-0" />
+                  <div className="aspect-[4/3] w-full">
+                    <img src={file.url} alt={file.name} className="w-full h-full object-cover" />
+                  </div>
                 ) : (
-                  <FileText className="w-4 h-4 text-primary shrink-0" />
+                  <div className="aspect-[4/3] w-full flex flex-col items-center justify-center bg-muted/30">
+                    <FileText className="w-10 h-10 text-primary/40 mb-2" />
+                    <span className="text-xs text-muted-foreground font-medium">PDF Document</span>
+                  </div>
                 )}
-                <span className="text-sm text-foreground truncate flex-1">{file.name}</span>
-                <button type="button" onClick={() => removeFile(file.url)} className="text-muted-foreground hover:text-destructive transition-colors">
-                  <X className="w-4 h-4" />
-                </button>
+                <div className="flex items-center gap-2 p-2.5">
+                  {file.type.startsWith("image/") ? (
+                    <ImageIcon className="w-3.5 h-3.5 text-primary shrink-0" />
+                  ) : (
+                    <FileText className="w-3.5 h-3.5 text-primary shrink-0" />
+                  )}
+                  <span className="text-xs text-foreground truncate flex-1">{file.name}</span>
+                  <button type="button" onClick={() => removeFile(file.url)} className="text-muted-foreground hover:text-destructive transition-colors">
+                    <X className="w-4 h-4" />
+                  </button>
+                </div>
               </div>
             ))}
           </div>
