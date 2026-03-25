@@ -1,6 +1,8 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { Button } from "@/components/ui/button";
-import { Loader2, Stethoscope, ChevronDown, ChevronUp } from "lucide-react";
+import { Loader2, Stethoscope, ChevronDown, ChevronUp, Upload, X, FileText, Image as ImageIcon } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 
 const SYMPTOM_CATEGORIES = [
   {
@@ -72,6 +74,7 @@ export interface SymptomFormData {
   previous_sinus_history: boolean;
   environment: string;
   medications: string;
+  report_urls: string[];
 }
 
 interface SymptomFormProps {
@@ -91,6 +94,52 @@ export function SymptomForm({ onSubmit, isLoading }: SymptomFormProps) {
   const [environment, setEnvironment] = useState("");
   const [medications, setMedications] = useState("");
   const [showAdvanced, setShowAdvanced] = useState(false);
+  const [uploadedFiles, setUploadedFiles] = useState<{ name: string; url: string; type: string }[]>([]);
+  const [isUploading, setIsUploading] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (!files || files.length === 0) return;
+
+    const allowed = ["application/pdf", "image/jpeg", "image/png", "image/webp"];
+    const maxSize = 10 * 1024 * 1024; // 10MB
+
+    setIsUploading(true);
+    try {
+      for (const file of Array.from(files)) {
+        if (!allowed.includes(file.type)) {
+          toast.error(`${file.name}: Only PDF, JPG, PNG, WEBP files are supported.`);
+          continue;
+        }
+        if (file.size > maxSize) {
+          toast.error(`${file.name}: File too large (max 10MB).`);
+          continue;
+        }
+
+        const ext = file.name.split(".").pop();
+        const path = `${crypto.randomUUID()}.${ext}`;
+        const { error } = await supabase.storage.from("medical-reports").upload(path, file);
+        if (error) {
+          toast.error(`Failed to upload ${file.name}`);
+          continue;
+        }
+
+        const { data: urlData } = supabase.storage.from("medical-reports").getPublicUrl(path);
+        setUploadedFiles((prev) => [...prev, { name: file.name, url: urlData.publicUrl, type: file.type }]);
+      }
+      toast.success("Reports uploaded successfully!");
+    } catch {
+      toast.error("Upload failed. Please try again.");
+    } finally {
+      setIsUploading(false);
+      if (fileInputRef.current) fileInputRef.current.value = "";
+    }
+  };
+
+  const removeFile = (url: string) => {
+    setUploadedFiles((prev) => prev.filter((f) => f.url !== url));
+  };
 
   const toggleSymptom = (id: string) => {
     setSelectedSymptoms((prev) => (prev.includes(id) ? prev.filter((s) => s !== id) : [...prev, id]));
@@ -112,6 +161,7 @@ export function SymptomForm({ onSubmit, isLoading }: SymptomFormProps) {
       previous_sinus_history: previousHistory,
       environment,
       medications,
+      report_urls: uploadedFiles.map((f) => f.url),
     });
   };
 
@@ -339,6 +389,55 @@ export function SymptomForm({ onSubmit, isLoading }: SymptomFormProps) {
                 className="w-full p-3 rounded-lg border-2 border-border bg-card text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none transition-colors text-sm"
               />
             </div>
+          </div>
+        )}
+      </div>
+
+      {/* Medical Reports Upload */}
+      <div className="opacity-0 animate-fade-up" style={{ animationDelay: "750ms" }}>
+        <h3 className="font-display text-lg font-semibold text-foreground mb-2">Upload Medical Reports (Optional)</h3>
+        <p className="text-xs text-muted-foreground mb-3">Upload lab results, CT/X-ray scans, or doctor notes (PDF, JPG, PNG — max 10MB each)</p>
+        
+        <input
+          ref={fileInputRef}
+          type="file"
+          multiple
+          accept=".pdf,.jpg,.jpeg,.png,.webp"
+          onChange={handleFileUpload}
+          className="hidden"
+        />
+        
+        <button
+          type="button"
+          onClick={() => fileInputRef.current?.click()}
+          disabled={isUploading}
+          className="w-full p-6 rounded-xl border-2 border-dashed border-border bg-card hover:border-primary/40 hover:bg-primary/5 transition-all duration-200 flex flex-col items-center gap-2"
+        >
+          {isUploading ? (
+            <Loader2 className="w-6 h-6 text-primary animate-spin" />
+          ) : (
+            <Upload className="w-6 h-6 text-muted-foreground" />
+          )}
+          <span className="text-sm font-medium text-muted-foreground">
+            {isUploading ? "Uploading..." : "Click to upload or drag files here"}
+          </span>
+        </button>
+
+        {uploadedFiles.length > 0 && (
+          <div className="mt-3 space-y-2">
+            {uploadedFiles.map((file) => (
+              <div key={file.url} className="flex items-center gap-3 p-3 rounded-lg bg-surface-sunken border border-border">
+                {file.type.startsWith("image/") ? (
+                  <ImageIcon className="w-4 h-4 text-primary shrink-0" />
+                ) : (
+                  <FileText className="w-4 h-4 text-primary shrink-0" />
+                )}
+                <span className="text-sm text-foreground truncate flex-1">{file.name}</span>
+                <button type="button" onClick={() => removeFile(file.url)} className="text-muted-foreground hover:text-destructive transition-colors">
+                  <X className="w-4 h-4" />
+                </button>
+              </div>
+            ))}
           </div>
         )}
       </div>

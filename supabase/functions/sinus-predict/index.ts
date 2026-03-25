@@ -114,11 +114,49 @@ const symptomLabels: Record<string, string> = {
   snoring: "Snoring/Sleep Issues", nosebleeds: "Nosebleeds",
 };
 
+// ─── Fetch and encode uploaded reports for multimodal AI ───
+async function processReportFiles(reportUrls: string[]): Promise<{
+  imageContents: { type: "image_url"; image_url: { url: string } }[];
+  textSummary: string;
+}> {
+  const imageContents: { type: "image_url"; image_url: { url: string } }[] = [];
+  const textParts: string[] = [];
+
+  for (const url of reportUrls.slice(0, 5)) { // max 5 files
+    try {
+      const resp = await fetch(url);
+      if (!resp.ok) continue;
+
+      const contentType = resp.headers.get("content-type") || "";
+      const buffer = await resp.arrayBuffer();
+      const base64 = btoa(String.fromCharCode(...new Uint8Array(buffer)));
+
+      if (contentType.startsWith("image/")) {
+        const mimeType = contentType.split(";")[0];
+        imageContents.push({
+          type: "image_url",
+          image_url: { url: `data:${mimeType};base64,${base64}` },
+        });
+      } else if (contentType === "application/pdf") {
+        // For PDFs, send as image for Gemini to OCR/read
+        imageContents.push({
+          type: "image_url",
+          image_url: { url: `data:application/pdf;base64,${base64}` },
+        });
+      }
+    } catch (e) {
+      console.error("Failed to process report:", url, e);
+    }
+  }
+
+  return { imageContents, textSummary: textParts.join("\n\n") };
+}
+
 serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
 
   try {
-    const { symptoms, duration, severity, age, gender, allergies, smoking, previous_sinus_history, environment, medications } = await req.json();
+    const { symptoms, duration, severity, age, gender, allergies, smoking, previous_sinus_history, environment, medications, report_urls } = await req.json();
 
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY is not configured");
@@ -142,9 +180,20 @@ serve(async (req) => {
       xgboost: { accuracy: 58.4, model: "XGBoost (Ensemble)" },
     };
 
-    // ── Step 2: AI enrichment for clinical insights ──
+    // ── Step 2: Process uploaded reports ──
+    const hasReports = report_urls && report_urls.length > 0;
+    let reportData: Awaited<ReturnType<typeof processReportFiles>> | null = null;
+    if (hasReports) {
+      reportData = await processReportFiles(report_urls);
+    }
+
+    // ── Step 3: AI enrichment for clinical insights ──
     const symptomNames = symptoms.map((s: string) => symptomLabels[s] || s).join(", ");
     const topPrediction = lrResult.class;
+
+    const reportContext = hasReports
+      ? `\n\nIMPORTANT: The patient has uploaded ${report_urls.length} medical report(s) (lab results, imaging, or clinical notes). These are attached as images/documents. Please carefully examine each uploaded report and:\n1. Extract key findings (lab values, imaging results, diagnoses)\n2. Factor these findings into your clinical reasoning\n3. Note any abnormalities or concerns from the reports\n4. Adjust your confidence and recommendations based on the report data`
+      : "";
 
     const prompt = `You are a medical AI expert. A real trained Logistic Regression model (scikit-learn, trained on 2000 synthetic patient records with 22 features) has predicted "${topPrediction}" as the primary condition for a patient with the following profile:
 
@@ -165,9 +214,15 @@ ${probabilityDistribution.map(p => `- ${p.condition}: ${p.probability}%`).join("
 Top contributing features (RF importance): ${featureImportance.slice(0, 5).map(f => `${f.feature} (${f.importance})`).join(", ")}
 
 Training details: 2000 samples, 22 features, StandardScaler normalization, 80/20 train-test split, stratified.
-Model accuracies: LR ${MODEL_ACCURACIES.lr}%, RF ${MODEL_ACCURACIES.rf}%, DT ${MODEL_ACCURACIES.dt}%.
+Model accuracies: LR ${MODEL_ACCURACIES.lr}%, RF ${MODEL_ACCURACIES.rf}%, DT ${MODEL_ACCURACIES.dt}%.${reportContext}
 
 Provide a detailed clinical analysis. Validate or adjust the ML model's findings using your medical knowledge. Return structured output.`;
+
+    // Build message content (multimodal if reports exist)
+    const userContent: any[] = [{ type: "text", text: prompt }];
+    if (reportData && reportData.imageContents.length > 0) {
+      userContent.push(...reportData.imageContents);
+    }
 
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
@@ -176,10 +231,10 @@ Provide a detailed clinical analysis. Validate or adjust the ML model's findings
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        model: "google/gemini-3-flash-preview",
+        model: "google/gemini-2.5-flash",
         messages: [
-          { role: "system", content: "You are a medical AI validation system. You validate and enrich ML model predictions with clinical reasoning. Be evidence-based and transparent about limitations." },
-          { role: "user", content: prompt },
+          { role: "system", content: "You are a medical AI validation system. You validate and enrich ML model predictions with clinical reasoning. When medical reports are provided, carefully analyze them and incorporate findings into your assessment. Be evidence-based and transparent about limitations." },
+          { role: "user", content: userContent },
         ],
         tools: [{
           type: "function",
@@ -201,8 +256,9 @@ Provide a detailed clinical analysis. Validate or adjust the ML model's findings
                   items: { type: "object", properties: { name: { type: "string" }, likelihood: { type: "string", enum: ["Low", "Moderate", "High"] } }, required: ["name", "likelihood"] },
                 },
                 preprocessing_steps: { type: "array", items: { type: "string" } },
+                report_findings: { type: "string", description: "Summary of key findings extracted from uploaded medical reports. Empty if no reports uploaded." },
               },
-              required: ["condition", "confidence", "risk_level", "description", "clinical_reasoning", "recommendations", "when_to_see_doctor", "differential_diagnoses", "preprocessing_steps"],
+              required: ["condition", "confidence", "risk_level", "description", "clinical_reasoning", "recommendations", "when_to_see_doctor", "differential_diagnoses", "preprocessing_steps", "report_findings"],
               additionalProperties: false,
             },
           },
@@ -226,19 +282,23 @@ Provide a detailed clinical analysis. Validate or adjust the ML model's findings
 
     const prediction = JSON.parse(toolCall.function.arguments);
 
+    const pipelineSteps = [
+      "Categorical Encoding (Label Mapping)",
+      "Feature Scaling (StandardScaler — trained μ/σ)",
+      "Logistic Regression (Softmax, 8-class, real coefficients)",
+      "Random Forest Feature Importance (50 trees)",
+      ...(hasReports ? ["Medical Report Analysis (Multimodal AI)"] : []),
+      "AI Clinical Validation (Gemini)",
+    ];
+
     const combinedResult = {
       ...prediction,
       model_comparison: modelComparison,
       feature_importance: featureImportance,
       probability_distribution: probabilityDistribution,
       primary_model: "Logistic Regression (Real Trained Weights)",
-      pipeline_steps: [
-        "Categorical Encoding (Label Mapping)",
-        "Feature Scaling (StandardScaler — trained μ/σ)",
-        "Logistic Regression (Softmax, 8-class, real coefficients)",
-        "Random Forest Feature Importance (50 trees)",
-        "AI Clinical Validation (Gemini)",
-      ],
+      pipeline_steps: pipelineSteps,
+      reports_analyzed: hasReports ? report_urls.length : 0,
     };
 
     return new Response(JSON.stringify(combinedResult), {
