@@ -52,9 +52,12 @@ const Index = () => {
               <p className="text-[11px] text-muted-foreground leading-none">ML-Powered Disease Prediction</p>
             </div>
           </div>
-          <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
-            <ShieldCheck className="w-3.5 h-3.5 text-success" />
-            <span>XGBoost + AI</span>
+          <div className="flex items-center gap-2">
+            <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+              <ShieldCheck className="w-3.5 h-3.5 text-success" />
+              <span>XGBoost + AI</span>
+            </div>
+            <ThemeToggle />
           </div>
         </div>
       </header>
