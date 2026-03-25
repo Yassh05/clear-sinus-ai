@@ -2,6 +2,7 @@ import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { SymptomForm, type SymptomFormData } from "@/components/SymptomForm";
 import { PredictionResult } from "@/components/PredictionResult";
+import { FollowUpChat } from "@/components/FollowUpChat";
 import { toast } from "sonner";
 import { Activity, Brain, ShieldCheck, Database, GitCompare } from "lucide-react";
 
