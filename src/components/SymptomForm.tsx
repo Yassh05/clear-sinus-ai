@@ -21,6 +21,7 @@ const SYMPTOM_CATEGORIES = [
       { id: "post_nasal_drip", label: "Post-Nasal Drip", description: "Mucus dripping down throat" },
       { id: "cough", label: "Cough", description: "Especially at night" },
       { id: "ear_pressure", label: "Ear Pressure / Fullness", description: "Blocked or full sensation" },
+      { id: "itchy_watery_eyes", label: "Itchy / Watery Eyes", description: "Eye irritation or tearing" },
     ],
   },
   {
