@@ -14,6 +14,7 @@ const Index = () => {
 
   const handleSubmit = async (data: SymptomFormData) => {
     setIsLoading(true);
+    setLastFormData(data);
     try {
       const { data: prediction, error } = await supabase.functions.invoke("sinus-predict", {
         body: data,
