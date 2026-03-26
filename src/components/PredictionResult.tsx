@@ -2,6 +2,7 @@ import { AlertTriangle, CheckCircle2, Info, Shield, ArrowLeft, Brain, BarChart3,
 import { Button } from "@/components/ui/button";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell } from "recharts";
 import { generateMedicalReport } from "@/utils/generateReport";
+import type { SymptomFormData } from "@/components/SymptomForm";
 
 interface FeatureImportance {
   feature: string;
