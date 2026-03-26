@@ -10,9 +10,11 @@ import { ThemeToggle } from "@/components/ThemeToggle";
 const Index = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [result, setResult] = useState<any>(null);
+  const [lastFormData, setLastFormData] = useState<SymptomFormData | null>(null);
 
   const handleSubmit = async (data: SymptomFormData) => {
     setIsLoading(true);
+    setLastFormData(data);
     try {
       const { data: prediction, error } = await supabase.functions.invoke("sinus-predict", {
         body: data,
@@ -107,7 +109,7 @@ const Index = () => {
         ) : (
           <>
             <div className="max-w-2xl mx-auto">
-              <PredictionResult result={result} onReset={() => setResult(null)} />
+              <PredictionResult result={result} formData={lastFormData} onReset={() => { setResult(null); setLastFormData(null); }} />
             </div>
             <FollowUpChat predictionContext={result} />
           </>

@@ -2,6 +2,7 @@ import { AlertTriangle, CheckCircle2, Info, Shield, ArrowLeft, Brain, BarChart3,
 import { Button } from "@/components/ui/button";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell } from "recharts";
 import { generateMedicalReport } from "@/utils/generateReport";
+import type { SymptomFormData } from "@/components/SymptomForm";
 
 interface FeatureImportance {
   feature: string;
@@ -44,6 +45,7 @@ interface PredictionData {
 
 interface PredictionResultProps {
   result: PredictionData;
+  formData?: SymptomFormData | null;
   onReset: () => void;
 }
 
@@ -73,7 +75,7 @@ const riskConfig = {
 
 const CHART_COLORS = ["hsl(187, 60%, 38%)", "hsl(160, 45%, 45%)", "hsl(205, 78%, 52%)", "hsl(38, 92%, 50%)", "hsl(0, 72%, 51%)"];
 
-export function PredictionResult({ result, onReset }: PredictionResultProps) {
+export function PredictionResult({ result, formData, onReset }: PredictionResultProps) {
   const risk = riskConfig[result.risk_level];
   const RiskIcon = risk.icon;
 
@@ -332,7 +334,7 @@ export function PredictionResult({ result, onReset }: PredictionResultProps) {
 
       <div className="opacity-0 animate-fade-up flex gap-3" style={{ animationDelay: "700ms" }}>
         <Button
-          onClick={() => generateMedicalReport(result)}
+          onClick={() => generateMedicalReport(result, formData ?? undefined)}
           className="flex-1 h-12 rounded-xl active:scale-[0.98] transition-all"
         >
           <Download className="w-4 h-4" />
