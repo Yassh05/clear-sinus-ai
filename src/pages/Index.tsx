@@ -10,6 +10,7 @@ import { ThemeToggle } from "@/components/ThemeToggle";
 const Index = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [result, setResult] = useState<any>(null);
+  const [lastFormData, setLastFormData] = useState<SymptomFormData | null>(null);
 
   const handleSubmit = async (data: SymptomFormData) => {
     setIsLoading(true);
