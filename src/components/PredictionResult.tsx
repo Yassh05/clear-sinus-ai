@@ -334,7 +334,7 @@ export function PredictionResult({ result, formData, onReset }: PredictionResult
 
       <div className="opacity-0 animate-fade-up flex gap-3" style={{ animationDelay: "700ms" }}>
         <Button
-          onClick={() => generateMedicalReport(result)}
+          onClick={() => generateMedicalReport(result, formData ?? undefined)}
           className="flex-1 h-12 rounded-xl active:scale-[0.98] transition-all"
         >
           <Download className="w-4 h-4" />
