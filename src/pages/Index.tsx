@@ -109,7 +109,7 @@ const Index = () => {
         ) : (
           <>
             <div className="max-w-2xl mx-auto">
-              <PredictionResult result={result} onReset={() => setResult(null)} />
+              <PredictionResult result={result} formData={lastFormData} onReset={() => { setResult(null); setLastFormData(null); }} />
             </div>
             <FollowUpChat predictionContext={result} />
           </>
