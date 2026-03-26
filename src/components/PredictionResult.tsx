@@ -75,7 +75,7 @@ const riskConfig = {
 
 const CHART_COLORS = ["hsl(187, 60%, 38%)", "hsl(160, 45%, 45%)", "hsl(205, 78%, 52%)", "hsl(38, 92%, 50%)", "hsl(0, 72%, 51%)"];
 
-export function PredictionResult({ result, onReset }: PredictionResultProps) {
+export function PredictionResult({ result, formData, onReset }: PredictionResultProps) {
   const risk = riskConfig[result.risk_level];
   const RiskIcon = risk.icon;
 
