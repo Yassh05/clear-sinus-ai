@@ -45,6 +45,7 @@ interface PredictionData {
 
 interface PredictionResultProps {
   result: PredictionData;
+  formData?: SymptomFormData | null;
   onReset: () => void;
 }
 
