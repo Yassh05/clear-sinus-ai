@@ -4,8 +4,9 @@ import { SymptomForm, type SymptomFormData } from "@/components/SymptomForm";
 import { PredictionResult } from "@/components/PredictionResult";
 import { FollowUpChat } from "@/components/FollowUpChat";
 import { toast } from "sonner";
-import { Activity, Brain, ShieldCheck, Database, GitCompare } from "lucide-react";
+import { Brain, ShieldCheck, Database, GitCompare } from "lucide-react";
 import { ThemeToggle } from "@/components/ThemeToggle";
+import noseLogo from "@/assets/nose-logo.svg";
 
 const Index = () => {
   const [isLoading, setIsLoading] = useState(false);
@@ -47,7 +48,7 @@ const Index = () => {
         <div className="container max-w-4xl mx-auto px-4 h-16 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="w-9 h-9 rounded-xl bg-primary/10 flex items-center justify-center">
-              <Activity className="w-5 h-5 text-primary" />
+              <img src={noseLogo} alt="Clear-Sinus AI logo" className="w-6 h-6 object-contain" />
             </div>
             <div>
               <h1 className="font-display text-base font-bold text-foreground leading-tight">SinusAI</h1>

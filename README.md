@@ -1,3 +1,3 @@
-# Welcome to your Lovable project
+# Clear-Sinus AI
 
 TODO: Document your project here
