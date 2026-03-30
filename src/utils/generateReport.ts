@@ -204,7 +204,7 @@ export function generateMedicalReport(result: PredictionData, formData?: Symptom
 
   doc.setFontSize(8);
   doc.setTextColor(180, 220, 220);
-  doc.text("ML-Powered  •  XGBoost + AI Clinical Validation", pageWidth - 16, 37, { align: "right" });
+  doc.text("ML-Powered  •  Gradient Boosting + AI Clinical Validation", pageWidth - 16, 37, { align: "right" });
 
   let y = 50;
 
