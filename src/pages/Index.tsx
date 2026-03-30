@@ -78,7 +78,7 @@ const Index = () => {
                 AI-Based Sinus & Nasal<br />Disease Prediction System
               </h2>
               <p className="text-muted-foreground max-w-lg mx-auto leading-relaxed">
-                Powered by XGBoost, Random Forest, Logistic Regression & Decision Trees
+                Powered by Gradient Boosting, Random Forest, Logistic Regression & Decision Trees
                 with AI-driven clinical validation and explainable predictions.
               </p>
             </section>
