@@ -58,7 +58,7 @@ const Index = () => {
           <div className="flex items-center gap-2">
             <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
               <ShieldCheck className="w-3.5 h-3.5 text-success" />
-              <span>XGBoost + AI</span>
+              <span>GBM + AI</span>
             </div>
             <ThemeToggle />
           </div>
@@ -78,7 +78,7 @@ const Index = () => {
                 AI-Based Sinus & Nasal<br />Disease Prediction System
               </h2>
               <p className="text-muted-foreground max-w-lg mx-auto leading-relaxed">
-                Powered by XGBoost, Random Forest, Logistic Regression & Decision Trees
+                Powered by Gradient Boosting, Random Forest, Logistic Regression & Decision Trees
                 with AI-driven clinical validation and explainable predictions.
               </p>
             </section>
